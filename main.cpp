@@ -17,19 +17,25 @@
 
 **********************************************/
 
-#include <QApplication>
-#include <QTreeView>
-#include <QFile>
-#include <string>
 #include "qjsonmodel.h"
+#include <QApplication>
+#include <QFile>
+#include <QMainWindow>
+#include <QToolBar>
+#include <QTreeView>
+#include <string>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char* argv[])
+{ // 3728
     QApplication a(argc, argv);
+    QMainWindow* wid= new QMainWindow();
+    auto tools= wid->addToolBar("Tools");
+    QAction* action= new QAction("save", wid);
+    tools->addAction(action);
+    QTreeView* view= new QTreeView;
+    QJsonModel* model= new QJsonModel;
 
-    QTreeView * view   = new QTreeView;
-    QJsonModel * model = new QJsonModel;
-
+    QObject::connect(action, SIGNAL(triggered()), model, SLOT(saveData()));
     view->setModel(model);
 
     std::string json = R"({
@@ -60,6 +66,8 @@ int main(int argc, char *argv[])
 
     model->loadJson(QByteArray::fromStdString(json));
     view->show();
+    wid->setCentralWidget(view);
+    wid->show();
 
     return a.exec();
 }
